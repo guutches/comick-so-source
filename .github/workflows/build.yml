@@ -10,15 +10,17 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Prepare site
+        run: |
           MANIFEST_URL="https://guutches.github.io/comick-so-source/manifest.json"
           mkdir -p _site
-          # publish your source and manifest at the site root
           cp -r src _site/
           cp manifest.json _site/
-          # landing page with Add to Paperback button + fallback
           cat > _site/index.html <<EOF
           <!doctype html>
           <meta charset="utf-8">
@@ -38,11 +40,11 @@ jobs:
             <h1>ComicK (SO) — Paperback Source</h1>
             <p>Tap the button below on your iPhone/iPad with <b>Paperback</b> installed:</p>
             <p>
-              <a class="btn" href="paperback://addRepo?url=$(printf %s "$MANIFEST_URL" | sed 's/:/%3A/g;s/\//%2F/g')">Add to Paperback</a>
+              <a class="btn" href="paperback://addRepo?url=https%3A%2F%2Fguutches.github.io%2Fcomick-so-source%2Fmanifest.json">Add to Paperback</a>
             </p>
             <div class="list">
               <p>Or add manually via <i>Paperback → Settings → External Sources → Add</i> using this URL:</p>
-              <p><code>${MANIFEST_URL}</code></p>
+              <p><code>https://guutches.github.io/comick-so-source/manifest.json</code></p>
             </div>
             <p class="muted">If the deep link doesn’t open, copy the URL above and paste it in Paperback.</p>
           </div>
@@ -50,6 +52,5 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      - id: deployment
+        uses: actions/deploy-pages@v4
