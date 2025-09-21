@@ -1,0 +1,23 @@
+{
+  "repo": {
+    "name": "ComicK (SO) Only",
+    "id": "comick-so-repo",
+    "author": "You",
+    "version": "1.0.0",
+    "website": "https://comick.so",
+    "description": "Single-source Paperback repo for ComicK using comick.so"
+  },
+  "sources": [
+    {
+      "id": "comick",
+      "name": "ComicK (SO)",
+      "author": "You",
+      "desc": "ComicK source pointing to comick.so",
+      "version": "1.0.0",
+      "websiteBaseURL": "https://comick.so",
+      "language": "EN",
+      "type": "MANGA",
+      "nsfw": false
+    }
+  ]
+}

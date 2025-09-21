@@ -1,0 +1,13 @@
+{
+  "name": "paperback-comick-so",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal Paperback 0.8 repo with a single ComicK source pointing to comick.so",
+  "scripts": {
+    "build": "tsc -p .",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
