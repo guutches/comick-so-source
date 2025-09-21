@@ -1,22 +1,31 @@
 // Minimal ComicK source pointing to comick.so
-// NOTE: This is a simplified skeleton so you can wire it up in your repo quickly.
-// You may need to adapt function names/types to match your existing base Source class.
+// TypeScript-friendly: declares fields so tsc doesn't error.
 
 const BASE = "https://comick.so";
 
 export default class ComicK {
-  constructor(cheerio, requestManager, createRequestObject) {
+  // --- field declarations to satisfy TypeScript ---
+  cheerio: any;
+  requestManager: any;
+  createRequestObject: any;
+
+  id: string;
+  name: string;
+  version: string;
+  author: string;
+
+  constructor(cheerio: any, requestManager: any, createRequestObject: any) {
     this.cheerio = cheerio;
     this.requestManager = requestManager;
     this.createRequestObject = createRequestObject;
+
     this.id = "comick";
     this.name = "ComicK (SO)";
-    this.version = "1.0.0";
-    this.author = "You";
+    this.version = "1.0.1";
+    this.author = "guutches";
   }
 
-  async getMangaDetails(mangaId) {
-    // Adjust URL pattern to the actual comick.so manga detail path if needed
+  async getMangaDetails(mangaId: string) {
     const url = `${BASE}/comic/${mangaId}`;
     const req = this.createRequestObject({ url, method: "GET" });
     const res = await this.requestManager.schedule(req, 1);
@@ -26,8 +35,8 @@ export default class ComicK {
     const image = $("img[alt='cover'], .cover img, .thumbnail img").first().attr("src") || "";
     const desc = $("meta[name='description']").attr("content") || $(".summary, .description").text().trim() || "";
 
-    const tags = [];
-    $(".genres a, .tag a, [data-test='genre'] a").each((_, el) => {
+    const tags: { id: string; label: string }[] = [];
+    $(".genres a, .tag a, [data-test='genre'] a").each((_: any, el: any) => {
       const t = $(el).text().trim();
       if (t) tags.push({ id: t.toLowerCase().replace(/\s+/g, "-"), label: t });
     });
@@ -42,19 +51,18 @@ export default class ComicK {
     };
   }
 
-  async getChapters(mangaId) {
+  async getChapters(mangaId: string) {
     const url = `${BASE}/comic/${mangaId}`;
     const req = this.createRequestObject({ url, method: "GET" });
     const res = await this.requestManager.schedule(req, 1);
     const $ = this.cheerio.load(res.data);
 
-    const chapters = [];
+    const chapters: any[] = [];
 
-    // Common patterns; adjust selectors to comick.so once you inspect its HTML
-    $(".chapter, .chapters li, [data-test='chapter-list'] a").each((i, el) => {
+    $(".chapter, .chapters li, [data-test='chapter-list'] a").each((i: number, el: any) => {
       const a = $(el).is("a") ? $(el) : $(el).find("a").first();
       const href = a.attr("href") || "";
-      const id = href.split("/").filter(Boolean).pop();
+      const id = href.split("/").filter(Boolean).pop() || `${i+1}`;
       const name = a.text().trim() || `Ch ${i + 1}`;
       const numMatch = name.match(/(\d+(?:\.\d+)?)/);
       const chapNum = numMatch ? parseFloat(numMatch[1]) : i + 1;
@@ -68,24 +76,22 @@ export default class ComicK {
     return chapters;
   }
 
-  async getChapterDetails(mangaId, chapterId) {
+  async getChapterDetails(mangaId: string, chapterId: string) {
     const url = `${BASE}/chapter/${chapterId}`;
     const req = this.createRequestObject({ url, method: "GET" });
     const res = await this.requestManager.schedule(req, 1);
     const $ = this.cheerio.load(res.data);
 
-    const pages = [];
+    const pages: string[] = [];
 
-    // Direct images
-    $("img.page, .reader img, .page img").each((_, el) => {
+    $("img.page, .reader img, .page img").each((_: any, el: any) => {
       const src = $(el).attr("data-src") || $(el).attr("src");
       if (src) pages.push(src);
     });
 
-    // Fallback: JSON in scripts
     if (pages.length === 0) {
-      const scripts = $("script").toArray().map(s => $(s).html() || "");
-      const blob = scripts.find(t => /pages|images/i.test(t));
+      const scripts = $("script").toArray().map((s: any) => $(s).html() || "");
+      const blob = scripts.find((t: string) => /pages|images/i.test(t));
       if (blob) {
         try {
           const match = blob.match(/\{[^]*\}/);
@@ -106,18 +112,18 @@ export default class ComicK {
     };
   }
 
-  async searchRequest(query) {
+  async searchRequest(query: { title?: string }) {
     const q = (query?.title || "").trim();
     const url = `${BASE}/search?q=${encodeURIComponent(q)}`;
     const req = this.createRequestObject({ url, method: "GET" });
     const res = await this.requestManager.schedule(req, 1);
     const $ = this.cheerio.load(res.data);
 
-    const results = [];
-    $(".search .item, .result .item, .manga-item").each((_, el) => {
+    const results: any[] = [];
+    $(".search .item, .result .item, .manga-item").each((_: any, el: any) => {
       const a = $(el).find("a").first();
       const href = a.attr("href") || "";
-      const id = href.split("/").filter(Boolean).pop();
+      const id = href.split("/").filter(Boolean).pop() || "";
       const title = $(el).find(".title, h3, h4").first().text().trim();
       const img = $(el).find("img").attr("data-src") || $(el).find("img").attr("src");
       if (id && title) results.push({ id, title, image: img });

@@ -2,8 +2,8 @@
   "repo": {
     "name": "ComicK (SO) Only",
     "id": "comick-so-repo",
-    "author": "You",
-    "version": "1.0.0",
+    "author": "guutches",
+    "version": "1.0.1",
     "website": "https://comick.so",
     "description": "Single-source Paperback repo for ComicK using comick.so"
   },
@@ -11,9 +11,9 @@
     {
       "id": "comick",
       "name": "ComicK (SO)",
-      "author": "You",
+      "author": "guutches",
       "desc": "ComicK source pointing to comick.so",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "websiteBaseURL": "https://comick.so",
       "language": "EN",
       "type": "MANGA",
